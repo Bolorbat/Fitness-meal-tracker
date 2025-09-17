@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f1caa060-1320-4a31-b2c1-22acc3d8a765" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/app/(tabs)/onboarding.tsx" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="31B3hG1LrTDYVrHGQTwwAZkopZ0" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;full.screen.before.presentation.mode&quot;: &quot;true&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/bolor/fitness-tracker/constants&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;inlay.hints&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\bolor\\fitness-tracker\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;,
+      &quot;mysql&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\bolor\fitness-tracker\constants" />
+      <recent name="C:\Users\bolor\fitness-tracker" />
+      <recent name="C:\Users\bolor\fitness-tracker\app" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\bolor\fitness-tracker\lib" />
+      <recent name="C:\Users\bolor\fitness-tracker\assets\icons" />
+      <recent name="C:\Users\bolor\fitness-tracker\app" />
+      <recent name="C:\Users\bolor\fitness-tracker\app\(tabs)" />
+      <recent name="C:\Users\bolor\fitness-tracker\app\(tabs)\Workout" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="database.ts" type="DatabaseScript" editBeforeRun="true" temporary="true" nameIsGenerated="true">
+      <script-file value="/database.ts" />
+      <script-mode>FILE</script-mode>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Database Script.database.ts" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-WS-252.23892.411" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f1caa060-1320-4a31-b2c1-22acc3d8a765" name="Changes" comment="" />
+      <created>1754983756745</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1754983756745</updated>
+      <workItem from="1754983758322" duration="515000" />
+      <workItem from="1754984291405" duration="609000" />
+      <workItem from="1754984907115" duration="2408000" />
+      <workItem from="1754987350283" duration="662000" />
+      <workItem from="1754991843806" duration="8929000" />
+      <workItem from="1755063391653" duration="1501000" />
+      <workItem from="1755078811968" duration="9308000" />
+      <workItem from="1755146983323" duration="14219000" />
+      <workItem from="1755174099347" duration="1287000" />
+      <workItem from="1755235680442" duration="9275000" />
+      <workItem from="1755321550012" duration="814000" />
+      <workItem from="1755411645206" duration="14156000" />
+      <workItem from="1755493234136" duration="17226000" />
+      <workItem from="1755579315540" duration="17329000" />
+      <workItem from="1755660062744" duration="15247000" />
+      <workItem from="1755697172593" duration="5070000" />
+      <workItem from="1755754079892" duration="4099000" />
+      <workItem from="1755758227061" duration="9041000" />
+      <workItem from="1755836517710" duration="4874000" />
+      <workItem from="1755841477186" duration="4451000" />
+      <workItem from="1755852984439" duration="12258000" />
+      <workItem from="1755920656586" duration="6905000" />
+      <workItem from="1756005925122" duration="4423000" />
+      <workItem from="1756010400985" duration="6754000" />
+      <workItem from="1756184371743" duration="5068000" />
+      <workItem from="1756275968015" duration="2668000" />
+      <workItem from="1756279390920" duration="7695000" />
+      <workItem from="1756356993557" duration="5734000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/node_modules/react-native-tab-view/lib/typescript/src/TabBar.d.ts</url>
+          <line>8</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

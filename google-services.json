@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "321341679216",
+    "project_id": "fittly-ef299",
+    "storage_bucket": "fittly-ef299.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:321341679216:android:c606ea870593a17c8ab6b5",
+        "android_client_info": {
+          "package_name": "com.nomadsys.fittly"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPBVA0CtP6vONZ77UMLlIDFM7Ylh_Q-As"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

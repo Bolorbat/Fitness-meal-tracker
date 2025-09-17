@@ -47,6 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         email,
         password
       );
+      setUser(UserCredential.user);
       return UserCredential;
     } catch (e) {
       throw e;

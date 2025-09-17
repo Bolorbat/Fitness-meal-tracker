@@ -1,4 +1,5 @@
-import { MealItem } from "@/models/meal";
+import { MealItem } from "../../models/meal";
+import { apiClient } from "./apiClient";
 
 interface SearchParams {
   query: string;

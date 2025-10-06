@@ -14,10 +14,16 @@ export const uploadToSupabase = async (
 
     if (fetchError) throw fetchError;
 
+    const hasSyncedColumn = "synced" in records[0];
+
+    const syncedRecords = hasSyncedColumn 
+      ? records.map((r) => ({...r, synced : 1}))
+      : records;
+
     // Upsert local records
     const { error: upsertError } = await supabase
       .from(tableName)
-      .upsert(records, { onConflict: primaryKey });
+      .upsert(syncedRecords, { onConflict: primaryKey });
 
     if (upsertError) throw upsertError;
 

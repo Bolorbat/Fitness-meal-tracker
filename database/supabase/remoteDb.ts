@@ -55,5 +55,6 @@ export const downloadFromSupabase = async (
   }
   if (data && data.length > 0) {
     await updateLocalRecords(tableName, primaryKey, records);
+    console.log(`${tableName} is updated from supabase to local`);
   }
 };

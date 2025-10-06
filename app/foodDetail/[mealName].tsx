@@ -94,7 +94,6 @@ const FoodDetails = () => {
         created_at: "12:30",
       };
       const mealId = await db.meal.addMeal(meal);
-      console.log(mealId);
       const mealItem = {
         ...mealData,
         meal_id: mealId,

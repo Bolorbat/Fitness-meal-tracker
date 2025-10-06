@@ -6,6 +6,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   Button,
+  Dimensions,
   FlatList,
   ImageSourcePropType,
   ScrollView,
@@ -42,29 +43,31 @@ type DailyGoalConfig = {
 
 const END_POSITION = -100;
 const CARD_HEIGHT = 120;
+const SCREEN_WIDTH = Dimensions.get("screen").width;
 
 function mapUserGoalToDailyConfig(
-  userGoal: UserGoal | null
+  userGoal: UserGoal | null,
+  totals: { protein: number; carbs: number; fat: number }
 ): DailyGoalConfig[] {
   if (!userGoal) return [];
 
   return [
     {
-      leftValue: userGoal.target_protein ?? 0,
+      leftValue: Math.round(userGoal.target_protein - totals.protein),
       maxValue: userGoal.target_protein ?? 0,
       label: "Protein",
       strokeColor: "#de6969",
       icon: require("./../../assets/icons/workout.png"),
     },
     {
-      leftValue: userGoal.target_carbs ?? 0,
+      leftValue: Math.round(userGoal.target_carbs - totals.carbs),
       maxValue: userGoal.target_carbs ?? 0,
       label: "Carbs",
       strokeColor: "#de9a69",
       icon: require("./../../assets/icons/workout.png"),
     },
     {
-      leftValue: userGoal.target_fat ?? 0,
+      leftValue: Math.round(userGoal.target_fat - totals.fat),
       maxValue: userGoal.target_fat ?? 0,
       label: "Fat",
       strokeColor: "#6998de",
@@ -73,7 +76,13 @@ function mapUserGoalToDailyConfig(
   ];
 }
 
-function CaloriesCard({ dailyCalories }: { dailyCalories: number }) {
+function CaloriesCard({
+  dailyCalories,
+  totalCalories,
+}: {
+  dailyCalories: number;
+  totalCalories: number;
+}) {
   return (
     <View className="flex-row rounded-2xl shadow-md bg-white h-[150px]">
       <View className="w-1/2 h-full items-start justify-center pl-8">
@@ -86,7 +95,7 @@ function CaloriesCard({ dailyCalories }: { dailyCalories: number }) {
       </View>
       <View className="w-1/2 h-full items-center justify-center relative">
         <CircularProgress
-          value={(50 / dailyCalories) * 100}
+          value={(totalCalories / dailyCalories) * 100}
           showProgressValue={true}
           activeStrokeColor="#000"
           inActiveStrokeColor="#DDDDDD"
@@ -138,7 +147,8 @@ function RecentFoodCard({
   const onLeft = useSharedValue(true);
   const position = useSharedValue(0);
   const itemHeight = useSharedValue(CARD_HEIGHT);
-  const itemOpacity = useSharedValue(1);
+  const cardOpacity = useSharedValue(1);
+  const deleteOpacity = useSharedValue(1);
 
   const panGesture = Gesture.Pan()
     .onUpdate((e) => {
@@ -150,10 +160,10 @@ function RecentFoodCard({
     })
     .onEnd((e) => {
       if (position.value < END_POSITION / 2) {
-        position.value = withTiming(END_POSITION, { duration: 100 });
+        position.value = withTiming(END_POSITION, undefined);
         onLeft.value = false;
       } else {
-        position.value = withTiming(0, { duration: 100 });
+        position.value = withTiming(0, undefined);
         onLeft.value = true;
       }
     });
@@ -161,27 +171,47 @@ function RecentFoodCard({
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: position.value }],
     height: itemHeight.value,
+    opacity: cardOpacity.value,
+  }));
+
+  const deleteAnimatedStyle = useAnimatedStyle(() => ({
+    height: itemHeight.value,
+    opacity: deleteOpacity.value,
   }));
 
   const handleDelete = () => {
-    itemOpacity.value = withTiming(0, { duration: 100 });
-    itemHeight.value = withTiming(0, { duration: 100 }, (finished) => {
-      if (finished) {
-        runOnJS(onDelete)();
+    // Animate card sliding fully left
+    deleteOpacity.value = 0;
+    position.value = withTiming(
+      -SCREEN_WIDTH,
+      { duration: 300 },
+      (finished) => {
+        if (finished) {
+          // After it slides off, shrink height to remove visually
+          cardOpacity.value = withTiming(0, { duration: 150 });
+          itemHeight.value = withTiming(0, { duration: 200 }, (done) => {
+            if (done) {
+              runOnJS(onDelete)();
+            }
+          });
+        }
       }
-    });
+    );
   };
 
   return (
     <GestureHandlerRootView>
-      <View className="w-[200px] h-[120px] bg-red-400 absolute right-1 justify-start items-end rounded-2xl">
+      <Animated.View
+        style={[deleteAnimatedStyle]}
+        className="w-[200px] h-[120px] bg-red-400 absolute right-1 justify-start items-end rounded-2xl"
+      >
         <TouchableOpacity
           className="h-full justify-center items-end"
           onPress={handleDelete}
         >
           <TrashIcon style={{ width: 20, height: 20, marginRight: 40 }} />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
       <GestureDetector gesture={panGesture}>
         <Animated.View
           style={[animatedStyle]}
@@ -221,24 +251,43 @@ export default function Onboarding() {
   const { userGoal } = useUserGoal();
   const [goalsState, setGoalsState] = useState<DailyGoalConfig[]>([]);
   const [mealItems, setMealItems] = useState<MealItem[]>([]);
+  const [totalCalories, setTotalCalories] = useState(0);
+  const [totalProtein, setTotalProtein] = useState(0);
+  const [totalCarbs, setTotalCarbs] = useState(0);
+  const [totalFat, setTotalFat] = useState(0);
 
-  useEffect(() => {
-    setGoalsState(mapUserGoalToDailyConfig(userGoal));
-  }, [userGoal]);
+  const fetchMeals = async () => {
+    try {
+      const mealData = await db.meal.getMealItems();
+
+      const totals = mealData.reduce(
+        (acc, item) => {
+          acc.calories += item.calories;
+          acc.protein += item.protein;
+          acc.carbs += item.carbs;
+          acc.fat += item.fat;
+          return acc;
+        },
+        { calories: 0, protein: 0, carbs: 0, fat: 0 }
+      );
+
+      setTotalCalories(totals.calories);
+      setTotalProtein(totals.protein);
+      setTotalCarbs(totals.carbs);
+      setTotalFat(totals.fat);
+
+      setMealItems(mealData);
+
+      setGoalsState(mapUserGoalToDailyConfig(userGoal, totals));
+    } catch (err) {
+      console.log("error in fetch meal_items", err);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
-      const fetchMeal = async () => {
-        try {
-          const mealData = await db.meal.getMealItems();
-          if (mealData) setMealItems(mealData);
-        } catch (err) {
-          console.log("error in fetch meal_items", err);
-        }
-      };
-
-      fetchMeal();
-    }, [])
+      fetchMeals();
+    }, [userGoal])
   );
 
   const handleDeleteMeal = async (item: MealItem) => {
@@ -246,6 +295,8 @@ export default function Onboarding() {
     try {
       await db.meal.deleteMeal(item.meal_id);
       setMealItems((prev) => prev.filter((m) => item.meal_id !== m.meal_id));
+
+      fetchMeals();
     } catch (err) {
       console.log(`Error in delete ${item}`, err);
     }
@@ -263,7 +314,10 @@ export default function Onboarding() {
       showsVerticalScrollIndicator={false}
       ListHeaderComponent={
         <>
-          <CaloriesCard dailyCalories={userGoal?.daily_calories ?? 1} />
+          <CaloriesCard
+            dailyCalories={userGoal?.daily_calories ?? 1}
+            totalCalories={totalCalories}
+          />
 
           <View className="flex-row mt-3 gap-3" style={{ height: 155 }}>
             {goalsState.map((item, idx) => (
@@ -280,10 +334,7 @@ export default function Onboarding() {
         </>
       }
       renderItem={({ item }) => (
-        <RecentFoodCard
-          meal={item}
-          onDelete={() => handleDeleteMeal(item)}
-        />
+        <RecentFoodCard meal={item} onDelete={() => handleDeleteMeal(item)} />
       )}
       ListFooterComponent={
         <Button title="Add Food" onPress={navigateToFoodMenu} />

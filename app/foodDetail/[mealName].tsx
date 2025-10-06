@@ -4,7 +4,7 @@ import { fetchFood } from "@/database/supabase/fetchFood";
 import { Meal, MealItem } from "@/models/meal";
 import { searchFood } from "@/services/api/foodApi";
 import { Image } from "expo-image";
-import { useLocalSearchParams } from "expo-router";
+import { Router, useLocalSearchParams, useRouter } from "expo-router";
 import { FireIcon } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 import {
@@ -79,13 +79,14 @@ const FoodDetails = () => {
   const [mealData, setMealData] = useState<MealItem>();
   const [currentMeasure, setCurrentMeasure] = useState<string>("Medium");
   const [currentServings, setCurrentServings] = useState<string>("1");
+  const router = useRouter();
 
   const HandleOnMeasurement = (type: string) => {
     console.log(type);
     setCurrentMeasure(type);
   };
 
-  const HandleOnLog = async (): Promise<void> => {
+  const HandleOnLog = async (router: Router): Promise<void> => {
     if (mealData) {
       const meal: Meal = {
         name: "lunch",
@@ -99,6 +100,7 @@ const FoodDetails = () => {
         meal_id: mealId,
       };
       await db.meal.addMealItem(mealItem);
+      router.back();
     }
   };
 
@@ -113,7 +115,7 @@ const FoodDetails = () => {
         if (foodData) setMealData(foodData[0]);
         const mealItems = await db.meal.getMealItems();
         const meal = await db.meal.getMeal();
-        console.log("meal: " ,meal);
+        console.log("meal: ", meal);
         console.log("items : ", mealItems);
       } catch (err) {
         console.log("Error in foodDetails : " + err);
@@ -180,7 +182,7 @@ const FoodDetails = () => {
         <TouchableOpacity
           activeOpacity={0.75}
           className="absolute bottom-10 w-full h-[50px] bg-black rounded-full justify-center"
-          onPress={HandleOnLog}
+          onPress={() => HandleOnLog(router)}
         >
           <Text className="font-PoppinsRegular text-center text-white text-xl">
             Log

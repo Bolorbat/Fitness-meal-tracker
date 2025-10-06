@@ -11,7 +11,7 @@ export class MealRepository extends BaseRepository {
             INSERT INTO meals (name, date, time, synced) VALUES (?,?,?,0)`,
         [meal.name, meal.date, meal.time ?? null]
       );
-      this.syncToSupabase("meals", "id");
+      await this.syncToSupabase("meals", "id");
       return result.lastInsertRowId;
     } catch (err) {
       console.log("Error adding food : ", err);
@@ -37,7 +37,7 @@ export class MealRepository extends BaseRepository {
           item.portion_size,
         ]
       );
-      this.syncToSupabase("meal_items", "id");
+      await this.syncToSupabase("meal_items", "id");
       if (result) console.log("Meal added to local");
     } catch (err) {
       console.log("Error adding food : ", err);
@@ -45,14 +45,16 @@ export class MealRepository extends BaseRepository {
     }
   }
 
-  async deleteMeal(meal: Meal): Promise<void> {
+  async deleteMeal(id: number): Promise<void> {
     const db = await this.getDB();
     try {
-      const result = await db.runAsync(`DELETE FROM meal WHERE id = ?`, [
-        meal.id ?? 0,
-      ]);
+      const meal = (await db.getFirstAsync(
+        `SELECT food_name FROM meal_items WHERE meal_id = ?`,
+        [id]
+      )) as MealItem;
+      const result = await db.runAsync(`DELETE FROM meals WHERE id = ?`, [id]);
       if (result) {
-        alert(`${meal.name} + is deleted`);
+        alert(`${meal?.food_name} deleted`);
         this.syncToSupabase("meals", "id");
       }
     } catch (err) {

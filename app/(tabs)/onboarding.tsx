@@ -4,11 +4,33 @@ import { UserGoal } from "@/models/usergoals";
 import { Image } from "expo-image";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Button, ImageSourcePropType, ScrollView, View } from "react-native";
+import {
+  Button,
+  FlatList,
+  ImageSourcePropType,
+  ScrollView,
+  StyleSheet,
+  TouchableHighlight,
+  TouchableOpacity,
+  useAnimatedValue,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import Text from "./../../components/CustomText";
 import CircularProgress from "react-native-circular-progress-indicator";
-import { MealItem } from "@/models/meal";
-import { supabase } from "@/database/supabase/supabaseClient";
+import { Meal, MealItem } from "@/models/meal";
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler";
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { TrashIcon } from "phosphor-react-native";
 
 type DailyGoalConfig = {
   leftValue: number;
@@ -17,6 +39,9 @@ type DailyGoalConfig = {
   strokeColor: string;
   icon: ImageSourcePropType;
 };
+
+const END_POSITION = -100;
+const CARD_HEIGHT = 120;
 
 function mapUserGoalToDailyConfig(
   userGoal: UserGoal | null
@@ -103,30 +128,91 @@ function NutrientCard({ item }: { item: DailyGoalConfig }) {
   );
 }
 
-function RecentFoodCard({ meal }: { meal: MealItem }) {
+function RecentFoodCard({
+  meal,
+  onDelete,
+}: {
+  meal: MealItem;
+  onDelete: () => void;
+}) {
+  const onLeft = useSharedValue(true);
+  const position = useSharedValue(0);
+  const itemHeight = useSharedValue(CARD_HEIGHT);
+  const itemOpacity = useSharedValue(1);
+
+  const panGesture = Gesture.Pan()
+    .onUpdate((e) => {
+      if (onLeft.value) {
+        position.value = e.translationX;
+      } else {
+        position.value = END_POSITION + e.translationX;
+      }
+    })
+    .onEnd((e) => {
+      if (position.value < END_POSITION / 2) {
+        position.value = withTiming(END_POSITION, { duration: 100 });
+        onLeft.value = false;
+      } else {
+        position.value = withTiming(0, { duration: 100 });
+        onLeft.value = true;
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: position.value }],
+    height: itemHeight.value,
+  }));
+
+  const handleDelete = () => {
+    itemOpacity.value = withTiming(0, { duration: 100 });
+    itemHeight.value = withTiming(0, { duration: 100 }, (finished) => {
+      if (finished) {
+        runOnJS(onDelete)();
+      }
+    });
+  };
+
   return (
-    <View className="w-full h-32 border border-neutral-500 bg-[#DDDDDD] rounded-2xl py-2">
-      <View className="flex-1 flex-col ml-3 mr-3">
-        <View className="flex-1 justify-center items-stretch">
-          <View className="flex-row justify-between items-center">
-            <Text>{meal.food_name}</Text>
-            <View className="rounded-full bg-white p-1">
-              <Text>10:12</Text>
+    <GestureHandlerRootView>
+      <View className="w-[200px] h-[120px] bg-red-400 absolute right-1 justify-start items-end rounded-2xl">
+        <TouchableOpacity
+          className="h-full justify-center items-end"
+          onPress={handleDelete}
+        >
+          <TrashIcon style={{ width: 20, height: 20, marginRight: 40 }} />
+        </TouchableOpacity>
+      </View>
+      <GestureDetector gesture={panGesture}>
+        <Animated.View
+          style={[animatedStyle]}
+          className="w-full h-[120px] border border-neutral-500 bg-[#DDDDDD] rounded-2xl py-2 mb-3"
+        >
+          <View className="flex-1 flex-col ml-3 mr-3">
+            <View className="flex-1 justify-center items-stretch">
+              <View className="flex-row justify-between items-center">
+                <Text>{meal.food_name}</Text>
+                <View className="rounded-full bg-white p-1">
+                  <Text>10:12</Text>
+                </View>
+              </View>
+            </View>
+            <View className="flex-1 justify-center items-start">
+              <Text
+                className="text-lg"
+                style={{ fontFamily: "PoppinsSemiBold" }}
+              >
+                {meal.calories + " calories"}
+              </Text>
+            </View>
+            <View className="flex-1 flex-row justify-start items-start gap-2">
+              <Text>{Math.round(meal.protein) + "g"}</Text>
+              <Text>{Math.round(meal.carbs) + "g"}</Text>
+              <Text>{Math.round(meal.fat) + "g"}</Text>
             </View>
           </View>
-        </View>
-        <View className="flex-1 justify-center items-start">
-          <Text className="text-lg" style={{ fontFamily: "PoppinsSemiBold" }}>
-            {meal.calories + " calories"}
-          </Text>
-        </View>
-        <View className="flex-1 flex-row justify-start items-start gap-2">
-          <Text>{Math.round(meal.protein) + "g"}</Text>
-          <Text>{Math.round(meal.carbs) + "g"}</Text>
-          <Text>{Math.round(meal.fat) + "g"}</Text>
-        </View>
-      </View>
-    </View>
+        </Animated.View>
+      </GestureDetector>
+    </GestureHandlerRootView>
   );
 }
 
@@ -155,34 +241,53 @@ export default function Onboarding() {
     }, [])
   );
 
+  const handleDeleteMeal = async (item: MealItem) => {
+    //delete from supabase
+    try {
+      await db.meal.deleteMeal(item.meal_id);
+      setMealItems((prev) => prev.filter((m) => item.meal_id !== m.meal_id));
+    } catch (err) {
+      console.log(`Error in delete ${item}`, err);
+    }
+  };
+
   const navigateToFoodMenu = () => {
     router.push({ pathname: "/foodDetail/foodMenu" });
   };
 
   return (
-    <ScrollView className="flex p-7">
-      <CaloriesCard dailyCalories={userGoal?.daily_calories ?? 1} />
+    <FlatList
+      className="flex p-7"
+      data={mealItems}
+      keyExtractor={(item) => item.meal_id.toString()}
+      showsVerticalScrollIndicator={false}
+      ListHeaderComponent={
+        <>
+          <CaloriesCard dailyCalories={userGoal?.daily_calories ?? 1} />
 
-      <View className="flex-row mt-3 gap-3" style={{ height: 155 }}>
-        {goalsState.map((item, idx) => (
-          <NutrientCard key={idx} item={item} />
-        ))}
-      </View>
+          <View className="flex-row mt-3 gap-3" style={{ height: 155 }}>
+            {goalsState.map((item, idx) => (
+              <NutrientCard key={idx} item={item} />
+            ))}
+          </View>
 
-      <Text
-        className="mt-7 mb-2"
-        style={{ fontFamily: "PoppinsSemiBold", fontSize: 18 }}
-      >
-        Recently uploaded
-      </Text>
-
-      <View className="flex-col mt-3 gap-3">
-        {mealItems.map((item, idx) => (
-          <RecentFoodCard key={idx} meal={item} />
-        ))}
-      </View>
-
-      <Button title="Add Food" onPress={navigateToFoodMenu} />
-    </ScrollView>
+          <Text
+            className="mt-7 mb-2"
+            style={{ fontFamily: "PoppinsSemiBold", fontSize: 18 }}
+          >
+            Recently uploaded
+          </Text>
+        </>
+      }
+      renderItem={({ item }) => (
+        <RecentFoodCard
+          meal={item}
+          onDelete={() => handleDeleteMeal(item)}
+        />
+      )}
+      ListFooterComponent={
+        <Button title="Add Food" onPress={navigateToFoodMenu} />
+      }
+    />
   );
 }

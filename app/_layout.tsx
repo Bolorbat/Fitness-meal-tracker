@@ -47,8 +47,6 @@ function RootLayoutNav() {
   useEffect(() => {
     if (firstLaunch === null || initializing || !fontsLoaded) return;
 
-    if (path === "foodDetail/mealName") return;
-
     if (firstLaunch) {
       router.replace("/(auth)/register");
     } else if (!user) {

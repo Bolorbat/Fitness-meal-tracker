@@ -38,7 +38,7 @@ export const createMealItemTable = `
                 portion_size TEXT,
                 synced INTEGER DEFAULT 0,
                 updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (meal_id) REFERENCES meals(id)
+                FOREIGN KEY (meal_id) REFERENCES meals(id) ON DELETE CASCADE
                 )`
 export const createMealIndex = `
       CREATE INDEX IF NOT EXISTS idx_meals_user_date

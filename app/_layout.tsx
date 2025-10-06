@@ -5,10 +5,7 @@ import { Stack, useRouter, usePathname, useSegments } from "expo-router";
 import { useEffect, useState, useRef } from "react";
 import { useFonts } from "expo-font";
 import { isFirstLaunch } from "@/utils/isFirstLaunch";
-import { db } from "@/database/services/DataBaseService";
-import { createTables } from "@/database/supabase/supabaseClient";
 import { SyncAll, SyncService } from "@/database/supabase/sync";
-import { isOnline } from "@/database/supabase/network";
 
 function RootLayoutNav() {
   const [fontsLoaded] = useFonts({

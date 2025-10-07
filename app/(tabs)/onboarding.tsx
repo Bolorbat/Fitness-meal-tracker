@@ -87,7 +87,7 @@ function CaloriesCard({
     <View className="flex-row rounded-2xl shadow-md bg-white h-[150px]">
       <View className="w-1/2 h-full items-start justify-center pl-8">
         <Text className="font-PoppinsSemiBold text-[42px]">
-          {dailyCalories || 0}
+          {dailyCalories - totalCalories || 0}
         </Text>
         <Text className="-mt-2" style={{ fontSize: 14 }}>
           Calories left
@@ -222,7 +222,7 @@ function RecentFoodCard({
               <View className="flex-row justify-between items-center">
                 <Text>{meal.food_name}</Text>
                 <View className="rounded-full bg-white p-1">
-                  <Text>10:12</Text>
+                  <Text>{meal.time}</Text>
                 </View>
               </View>
             </View>
@@ -258,7 +258,7 @@ export default function Onboarding() {
 
   const fetchMeals = async () => {
     try {
-      const mealData = await db.meal.getMealItems();
+      const mealData = await db.meal.getBoth();
 
       const totals = mealData.reduce(
         (acc, item) => {

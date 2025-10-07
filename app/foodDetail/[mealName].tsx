@@ -82,17 +82,24 @@ const FoodDetails = () => {
   const router = useRouter();
 
   const HandleOnMeasurement = (type: string) => {
-    console.log(type);
     setCurrentMeasure(type);
   };
 
   const HandleOnLog = async (router: Router): Promise<void> => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
     if (mealData) {
       const meal: Meal = {
         name: "lunch",
-        date: "2025-05-02",
+        date: `${year}-${month}-${day}`,
+        time: `${hours}:${minutes}`,
         synced: 0,
-        created_at: "12:30",
+        created_at: String(`${year}:${month}:${day}`),
       };
       const mealId = await db.meal.addMeal(meal);
       const mealItem = {
@@ -114,7 +121,7 @@ const FoodDetails = () => {
         const foodData = await fetchFood({ name: mealName });
         if (foodData) setMealData(foodData[0]);
         const mealItems = await db.meal.getMealItems();
-        const meal = await db.meal.getMeal();
+        const meal = await db.meal.getMeal(mealData?.meal_id ?? 0);
         console.log("meal: ", meal);
         console.log("items : ", mealItems);
       } catch (err) {

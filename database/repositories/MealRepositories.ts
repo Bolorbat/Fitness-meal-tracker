@@ -62,10 +62,12 @@ export class MealRepository extends BaseRepository {
     }
   }
 
-  async getMeal(): Promise<Meal[]> {
+  async getMeal(id: number): Promise<Meal[]> {
     const db = await this.getDB();
     try {
-      return (await db.getAllAsync(`SELECT * FROM meals`)) as Meal[];
+      return (await db.getAllAsync(`SELECT * FROM meals WHERE id = ?`, [
+        id,
+      ])) as Meal[];
     } catch (err) {
       console.log("Error in get meal", err);
       throw err;
@@ -75,6 +77,17 @@ export class MealRepository extends BaseRepository {
     const db = await this.getDB();
     try {
       return (await db.getAllAsync(`SELECT * FROM meal_items`)) as MealItem[];
+    } catch (err) {
+      console.log("Error getting meal items from db");
+      throw err;
+    }
+  }
+  async getBoth(): Promise<MealItem[]> {
+    const db = await this.getDB();
+    try {
+      return (await db.getAllAsync(
+        `SELECT meal_items.*, meals.time, meals.date FROM meal_items INNER JOIN meals ON meal_items.meal_id = meals.id ORDER BY meals.date ASC, meals.time ASC`
+      )) as MealItem[];
     } catch (err) {
       console.log("Error getting meal items from db");
       throw err;

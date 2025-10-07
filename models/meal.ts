@@ -23,4 +23,8 @@ export interface MealItem {
   food_image?: string;
   synced?: number;
   updated_at?: string;
+
+  //from joined meal table
+  time?: string;
+  date?: string;
 }

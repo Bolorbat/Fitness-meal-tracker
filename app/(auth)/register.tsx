@@ -26,7 +26,7 @@ const Register = () => {
       const uid = userCredential.user.uid;
 
       await db.users.create({
-        user_id: uid,
+        id: uid,
         name: firstName,
         email: email,
       });

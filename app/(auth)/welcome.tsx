@@ -46,7 +46,7 @@ const welcome = () => {
             textColor={"#fff"}
             image={null}
             onPress={() => {
-              completeOnboarding(userData?.user_id ?? null);
+              completeOnboarding(userData?.id ?? null);
               router.replace("/(tabs)/onboarding");
             }}
           />

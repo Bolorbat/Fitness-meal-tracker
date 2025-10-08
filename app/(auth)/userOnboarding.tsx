@@ -2,6 +2,7 @@ import Button from "@/components/Button";
 import Text from "@/components/CustomText";
 import Input from "@/components/input";
 import Picker from "@/components/Picker";
+import { useAuth } from "@/contexts/autoContext";
 import { db } from "@/database/services/DataBaseService";
 import { useUser } from "@/hooks/userHook";
 import { useRouter } from "expo-router";
@@ -35,7 +36,7 @@ async function setUserData(
 const UserOnboarding = () => {
   const router = useRouter();
 
-  const { userData, loading } = useUser();
+  const { user } = useAuth();
   const [sex, setSex] = useState("");
   const [weight, setWeight] = useState<number | undefined>();
   const [height, setHeight] = useState<number | undefined>();
@@ -78,7 +79,7 @@ const UserOnboarding = () => {
   };
 
   const HandleNext = async () => {
-    setUserData(userData?.user_id || null, sex, weight, height, age);
+    setUserData(user?.uid ?? null, sex, weight, height, age);
     router.push("/goal");
   };
 

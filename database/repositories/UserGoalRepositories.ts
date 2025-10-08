@@ -28,9 +28,9 @@ export class UserGoalRepository extends BaseRepository {
 
     try {
       await db.runAsync(
-        `INSERT INTO userGoals(user_id, goal_type, daily_calories, target_protein, target_carbs, target_fat) VALUES (?,?,?,?,?,?)`,
+        `INSERT INTO user_goals(user_id, goal_type, daily_calories, target_protein, target_carbs, target_fat) VALUES (?,?,?,?,?,?)`,
         [
-          user.user_id,
+          user.id,
           goalType,
           daily_calories,
           target_protein,
@@ -38,18 +38,22 @@ export class UserGoalRepository extends BaseRepository {
           target_fat,
         ]
       );
+      await this.syncToSupabase("user_goals", "id");
     } catch (err) {
       console.log("Error in set user goals : ", err);
     }
   }
 
-  async findByUserId(uid : string) : Promise<UserGoal | undefined>{
+  async findByUserId(uid: string): Promise<UserGoal | undefined> {
     const db = await this.getDB();
-    try{
-        return (await db.getFirstAsync(`SELECT * from userGoals WHERE user_id = ?`, [uid])) as UserGoal;
-    }catch(err){
-        console.log("error getting user goal, ", err);
-        throw err;
+    try {
+      return (await db.getFirstAsync(
+        `SELECT * from user_goals WHERE user_id = ?`,
+        [uid]
+      )) as UserGoal;
+    } catch (err) {
+      console.log("error getting user goal, ", err);
+      throw err;
     }
   }
 }

@@ -1,6 +1,6 @@
 export const createUserTable = `
             CREATE TABLE IF NOT EXISTS users (
-                user_id TEXT PRIMARY KEY,
+                id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
                 email TEXT UNIQUE NOT NULL,
                 height INTEGER,
@@ -21,7 +21,7 @@ export const createMealTable = `
                 time TEXT,
                 synced INTEGER DEFAULT 0,
                 updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(user_id)
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )`;
 export const createMealItemTable = `
             CREATE TABLE IF NOT EXISTS meal_items (
@@ -53,8 +53,8 @@ export const createTableWorkouts = `
             sets INTEGER,
             reps INTEGER,
             weight REAL,
-            lastUpdate INTEGER,
-            FOREIGN KEY (user_id) REFERENCES users(user_id)
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
         )`;
 
 export const createWorkoutIndex = `
@@ -62,17 +62,17 @@ export const createWorkoutIndex = `
         ON workouts(user_id, date)`;
 
 export const createUserGoalsTable = `
-        CREATE TABLE IF NOT EXISTS userGoals(
-        id INTEGER PRIMARY KEY,
-        user_id TEXT,
+        CREATE TABLE IF NOT EXISTS user_goals(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT NOT NULL,
         goal_type TEXT,
         target_weight INTEGER,
         daily_calories INTEGER,
         target_protein INTEGER,
         target_carbs INTEGER,
         target_fat INTEGER,
-        lastUpdate INTEGER,
-        FOREIGN KEY (user_id) REFERENCES users(user_id)
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )`;
 
 export const createProgressTable = `
@@ -82,6 +82,6 @@ export const createProgressTable = `
             date TEXT NOT NULL CHECK (date LIKE '____-__-__'),
             weight REAL,
             notes TEXT,
-            lastUpdate INTEGER,
-            FOREIGN KEY (user_id) REFERENCES users(user_id)
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
         )`;

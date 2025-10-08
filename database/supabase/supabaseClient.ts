@@ -19,7 +19,7 @@ export const createTables = async () => {
   await supabase.rpc("sql", {
     sql: `
       CREATE TABLE IF NOT EXISTS users (
-        user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        id UUID PRIMARY KEY DEFAULT NOT NULL,
         name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
         height INTEGER,
@@ -38,7 +38,7 @@ export const createTables = async () => {
     sql: `
       CREATE TABLE IF NOT EXISTS meals (
         id SERIAL PRIMARY KEY,
-        user_id UUID REFERENCES users(user_id),
+        user_id UUID REFERENCES users(id),
         name TEXT NOT NULL,
         date DATE NOT NULL,
         time TIME,
@@ -72,7 +72,7 @@ export const createTables = async () => {
     sql: `
       CREATE TABLE IF NOT EXISTS workouts (
         id SERIAL PRIMARY KEY,
-        user_id UUID REFERENCES users(user_id),
+        user_id UUID REFERENCES users(id),
         date DATE NOT NULL,
         exercises TEXT NOT NULL,
         sets INT,
@@ -89,7 +89,7 @@ export const createTables = async () => {
     sql: `
       CREATE TABLE IF NOT EXISTS user_goals (
         id SERIAL PRIMARY KEY,
-        user_id UUID REFERENCES users(user_id),
+        user_id UUID REFERENCES users(id),
         goal_type TEXT,
         target_weight REAL,
         daily_calories INT,
@@ -106,7 +106,7 @@ export const createTables = async () => {
     sql: `
       CREATE TABLE IF NOT EXISTS progress (
         id SERIAL PRIMARY KEY,
-        user_id UUID REFERENCES users(user_id),
+        user_id UUID REFERENCES users(id),
         date DATE NOT NULL,
         weight REAL,
         notes TEXT,

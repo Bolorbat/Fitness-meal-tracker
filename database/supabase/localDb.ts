@@ -5,9 +5,7 @@ export const getLocalUpdateRecords = async (
 ): Promise<any[]> => {
   const db = await DatabaseConnection.getInstance().getDB();
 
-  return await db.getAllAsync(`SELECT * FROM ${tableName} WHERE synced = ?`, [
-    0,
-  ]);
+  return await db.getAllAsync(`SELECT * FROM ${tableName}`);
 };
 
 export const updateLocalRecords = async (

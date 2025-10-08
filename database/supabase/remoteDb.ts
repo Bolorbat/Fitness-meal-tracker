@@ -7,28 +7,24 @@ export const uploadToSupabase = async (
   records: any[]
 ): Promise<void> => {
   try {
-    // Get all remote records
+    console.log(records.length);
+    if (records.length === 0) {
+      return;
+    }
+
+    const { error: upsertError } = await supabase
+      .from(tableName)
+      .upsert(records, { onConflict: primaryKey });
+
+    if (upsertError) throw upsertError;
+
     const { data: remoteRecords, error: fetchError } = await supabase
       .from(tableName)
       .select(primaryKey);
 
     if (fetchError) throw fetchError;
 
-    const hasSyncedColumn = "synced" in records[0];
-
-    const syncedRecords = hasSyncedColumn 
-      ? records.map((r) => ({...r, synced : 1}))
-      : records;
-
-    // Upsert local records
-    const { error: upsertError } = await supabase
-      .from(tableName)
-      .upsert(syncedRecords, { onConflict: primaryKey });
-
-    if (upsertError) throw upsertError;
-
-    // Find and delete records that exist remotely but not locally
-    const localIds = new Set(records.map((r) => ((r as any))[primaryKey]));
+    const localIds = new Set(records.map((r) => (r as any)[primaryKey]));
     const idsToDelete =
       remoteRecords
         ?.filter((r) => !localIds.has((r as any)[primaryKey]))

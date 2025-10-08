@@ -1,5 +1,5 @@
 export interface User {
-  user_id: string;
+  id: string;
   name: string;
   email: string;
   height?: number | null; // in cm

@@ -7,9 +7,8 @@ export class MealRepository extends BaseRepository {
     const db = await this.getDB();
     try {
       const result = await db.runAsync(
-        `
-            INSERT INTO meals (name, date, time, synced) VALUES (?,?,?,0)`,
-        [meal.name, meal.date, meal.time ?? null]
+        `INSERT INTO meals (user_id, name, date, time, synced) VALUES (?,?,?,?,0)`,
+        [meal.user_id, meal.name, meal.date, meal.time ?? null]
       );
       await this.syncToSupabase("meals", "id");
       return result.lastInsertRowId;

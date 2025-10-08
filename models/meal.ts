@@ -1,5 +1,6 @@
 export interface Meal {
   id?: number;
+  user_id : string,
   name: string;
   // meal_type: "breakfast" | "lunch" | "dinner" | "snack";
   date: string; // YYYY-MM-DD format

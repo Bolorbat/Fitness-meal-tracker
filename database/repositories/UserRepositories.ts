@@ -4,19 +4,17 @@ import { BaseRepository } from "../repositories/BaseRepositories";
 export class UserRepository extends BaseRepository {
   async create(user: User): Promise<number> {
     const db = await this.getDB();
+    console.log(user);
     try {
       const result = await db?.runAsync(
-        `INSERT INTO users (user_id, name, email, height, weight, age, gender) VALUES (?,?,?,?,?,?,?)`,
+        `INSERT INTO users (id, name, email) VALUES (?,?,?)`,
         [
-          user.user_id,
+          user.id,
           user.name,
           user.email,
-          user.height ?? null,
-          user.weight ?? null,
-          user.age ?? null,
-          user.gender ?? null,
         ]
       );
+      await this.syncToSupabase("users", "id");
       return result.lastInsertRowId;
     } catch (e) {
       console.error("Error creating user: ", e);
@@ -35,9 +33,10 @@ export class UserRepository extends BaseRepository {
     const db = await this.getDB();
     try {
       await db.runAsync(
-        `UPDATE users SET gender = ?, weight = ?, height = ?, age = ? WHERE user_id = ?`,
+        `UPDATE users SET gender = ?, weight = ?, height = ?, age = ? WHERE id = ?`,
         [sex, weight, height, age, uid]
       );
+      await this.syncToSupabase("users", "id");
     } catch (err) {
       console.error("Error setting user: ", err);
     }
@@ -47,7 +46,7 @@ export class UserRepository extends BaseRepository {
     if (!uid) return;
     const db = await this.getDB();
     try {
-      return (await db.getFirstAsync(`SELECT * from users WHERE user_id = ?`, [
+      return (await db.getFirstAsync(`SELECT * from users WHERE id = ?`, [
         uid,
       ])) as User;
     } catch (err) {
@@ -69,7 +68,7 @@ export class UserRepository extends BaseRepository {
   async getOnboardingStatus(userId: string): Promise<boolean> {
     const db = await this.getDB();
     const result = await db.getFirstAsync<{ complete_onboarding: number }>(
-      `SELECT complete_onboarding FROM users WHERE user_id = ?`,
+      `SELECT complete_onboarding FROM users WHERE id = ?`,
       [userId]
     );
     return result?.complete_onboarding == 1;
@@ -79,9 +78,10 @@ export class UserRepository extends BaseRepository {
     const db = await this.getDB();
     try {
       await db.runAsync(
-        `UPDATE users SET complete_onboarding = 1 WHERE user_id = ?`,
+        `UPDATE users SET complete_onboarding = 1 WHERE id = ?`,
         [userId]
       );
+      await this.syncToSupabase("users", "id");
     } catch (err) {
       console.log("Error completing onboarding: ", err);
       throw err;

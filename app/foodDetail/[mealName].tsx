@@ -1,4 +1,5 @@
 import CustomText from "@/components/CustomText";
+import { useAuth } from "@/contexts/autoContext";
 import { db } from "@/database/services/DataBaseService";
 import { fetchFood } from "@/database/supabase/fetchFood";
 import { Meal, MealItem } from "@/models/meal";
@@ -86,6 +87,7 @@ const FoodDetails = () => {
   };
 
   const HandleOnLog = async (router: Router): Promise<void> => {
+    const { user } = useAuth();
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -100,6 +102,7 @@ const FoodDetails = () => {
         time: `${hours}:${minutes}`,
         synced: 0,
         created_at: String(`${year}:${month}:${day}`),
+        user_id: user?.uid ?? '',
       };
       const mealId = await db.meal.addMeal(meal);
       const mealItem = {

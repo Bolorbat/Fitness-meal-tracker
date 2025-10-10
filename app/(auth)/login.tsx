@@ -28,9 +28,8 @@ const Login = () => {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const res = await login(email, password);
-      if (res && userOnboardingStatus !== "done")
-        router.replace("/(auth)/userOnboarding");
+      await login(email, password);
+
       console.log("Login successful:");
     } catch (error: any) {
       console.log("Login error:", error);

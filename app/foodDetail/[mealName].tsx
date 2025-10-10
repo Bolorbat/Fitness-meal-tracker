@@ -81,13 +81,13 @@ const FoodDetails = () => {
   const [currentMeasure, setCurrentMeasure] = useState<string>("Medium");
   const [currentServings, setCurrentServings] = useState<string>("1");
   const router = useRouter();
+  const { user } = useAuth();
 
   const HandleOnMeasurement = (type: string) => {
     setCurrentMeasure(type);
   };
 
-  const HandleOnLog = async (router: Router): Promise<void> => {
-    const { user } = useAuth();
+  const HandleOnLog = async (router: Router, uid: string): Promise<void> => {
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -102,7 +102,7 @@ const FoodDetails = () => {
         time: `${hours}:${minutes}`,
         synced: 0,
         created_at: String(`${year}:${month}:${day}`),
-        user_id: user?.uid ?? '',
+        user_id: user?.uid ?? "",
       };
       const mealId = await db.meal.addMeal(meal);
       const mealItem = {
@@ -192,7 +192,7 @@ const FoodDetails = () => {
         <TouchableOpacity
           activeOpacity={0.75}
           className="absolute bottom-10 w-full h-[50px] bg-black rounded-full justify-center"
-          onPress={() => HandleOnLog(router)}
+          onPress={() => HandleOnLog(router, user?.uid ?? "")}
         >
           <Text className="font-PoppinsRegular text-center text-white text-xl">
             Log

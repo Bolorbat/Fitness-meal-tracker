@@ -4,7 +4,6 @@ import { BaseRepository } from "../repositories/BaseRepositories";
 export class UserRepository extends BaseRepository {
   async create(user: User): Promise<number> {
     const db = await this.getDB();
-    console.log(user);
     try {
       const result = await db?.runAsync(
         `INSERT INTO users (id, name, email) VALUES (?,?,?)`,

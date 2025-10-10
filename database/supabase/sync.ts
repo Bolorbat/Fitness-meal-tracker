@@ -5,7 +5,7 @@ import { downloadFromSupabase, uploadToSupabase } from "./remoteDb";
 
 interface SyncableTable {
   name: string;
-  primaryKey: string;
+  key: string;
 }
 
 export class SyncService {
@@ -16,24 +16,24 @@ export class SyncService {
     ((this.db = database), (this.tables = tables));
   }
 
-  async syncAll(): Promise<void> {
+  async syncAll(uid: string): Promise<void> {
     const online = await isOnline();
     if (!online) {
       console.log("Offline");
       return;
     }
     for (const table of this.tables) {
-      await this.syncTable(table);
+      await this.syncTable(table, uid);
     }
   }
 
-  async syncTable(table: SyncableTable): Promise<void> {
+  async syncTable(table: SyncableTable, uid : string): Promise<void> {
     try {
       const localRecords = await getLocalUpdateRecords(table.name);
       // if (localRecords.length > 0) {
-      await uploadToSupabase(table.name, table.primaryKey, localRecords);
+      await uploadToSupabase(table.name, table.key, localRecords);
       // }
-      await downloadFromSupabase(table.name, table.primaryKey, localRecords);
+      await downloadFromSupabase(table.name, table.key, localRecords, uid);
       console.log(`Synced ${table.name} successfully`);
     } catch (err) {
       console.log(`error syncing ${table.name}`, err);
@@ -46,16 +46,18 @@ export class SyncService {
   }
 }
 
-export const SyncAll = async (db: SQLite.SQLiteDatabase) => {
+export const SyncAll = async (db: SQLite.SQLiteDatabase, uid: string) => {
   const tables: SyncableTable[] = [
-    { name: "meals", primaryKey: "id" },
-    { name: "meal_items", primaryKey: "id" },
+    { name: "users", key: "id" },
+    { name: "user_goals", key: "id" },
+    { name: "meals", key: "id" },
+    { name: "meal_items", key: "id" },
   ];
 
   const syncService = new SyncService(db, tables);
 
   // Sync on app start
-  await syncService.syncAll();
+  await syncService.syncAll(uid);
 
   // Return for manual sync
   return syncService;
@@ -64,12 +66,13 @@ export const SyncAll = async (db: SQLite.SQLiteDatabase) => {
 export const SyncTable = async (
   tableName: string,
   tablePK: string,
-  db: SQLite.SQLiteDatabase
+  db: SQLite.SQLiteDatabase,
+  uid : string
 ) => {
-  const table: SyncableTable[] = [{ name: tableName, primaryKey: tablePK }];
+  const table: SyncableTable[] = [{ name: tableName, key: tablePK }];
   const syncService = new SyncService(db, table);
 
-  await syncService.syncTable(table[0]);
+  await syncService.syncTable(table[0], uid);
 
   return syncService;
 };

@@ -3,38 +3,39 @@ import { supabase } from "./supabaseClient";
 
 export const uploadToSupabase = async (
   tableName: string,
-  primaryKey: string,
+  key: string,
   records: any[]
 ): Promise<void> => {
   try {
-    console.log(records.length);
     if (records.length === 0) {
       return;
     }
 
     const { error: upsertError } = await supabase
       .from(tableName)
-      .upsert(records, { onConflict: primaryKey });
+      .upsert(records, { onConflict: key });
 
     if (upsertError) throw upsertError;
 
     const { data: remoteRecords, error: fetchError } = await supabase
       .from(tableName)
-      .select(primaryKey);
+      .select(key);
 
     if (fetchError) throw fetchError;
 
-    const localIds = new Set(records.map((r) => (r as any)[primaryKey]));
+    const localIds = new Set(records.map((r) => (r as any)[key]));
     const idsToDelete =
       remoteRecords
-        ?.filter((r) => !localIds.has((r as any)[primaryKey]))
-        .map((r) => (r as any)[primaryKey]) || [];
+        ?.filter((r) => !localIds.has((r as any)[key]))
+        .map((r) => (r as any)[key]) || [];
+
+    if (tableName == "users") return;
 
     if (idsToDelete.length > 0) {
       const { error: deleteError } = await supabase
         .from(tableName)
         .delete()
-        .in(primaryKey, idsToDelete);
+        .in(key, idsToDelete);
 
       if (deleteError) throw deleteError;
     }
@@ -46,8 +47,9 @@ export const uploadToSupabase = async (
 
 export const downloadFromSupabase = async (
   tableName: string,
-  primaryKey: string,
-  records: any[]
+  key: string,
+  records: any[],
+  uid: string
 ): Promise<void> => {
   const { data, error } = await supabase.from(tableName).select("*");
 
@@ -56,7 +58,7 @@ export const downloadFromSupabase = async (
     throw error;
   }
   if (data && data.length > 0) {
-    await updateLocalRecords(tableName, primaryKey, records);
+    await updateLocalRecords(tableName, key, records, uid);
     console.log(`${tableName} is updated from supabase to local`);
   }
 };

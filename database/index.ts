@@ -6,19 +6,7 @@ const DATABASE_NAME = "app.db";
 const DATABASE_VERSION = "1.0";
 
 export const initDB = async () => {
-  try {
-    const db = await SQLite.openDatabaseAsync(DATABASE_NAME, {
-      useNewConnection: true,
-    });
-
-    await db.execAsync(`PRAGMA foreign_keys = ON`);
-    await createTable(db);
-    console.log("Database initialized successfully");
-    return db;
-  } catch (err) {
-    console.log("Error in init : ", err);
-    throw err;
-  }
+  return await DatabaseConnection.getInstance().getDB();
 };
 
 const createTable = async (db: DB) => {
@@ -63,7 +51,12 @@ export class DatabaseConnection {
   }
   async getDB(): Promise<DB> {
     if (!this.db) {
-      this.db = await initDB();
+      this.db = await SQLite.openDatabaseAsync(DATABASE_NAME, {
+        useNewConnection : true
+      })
+      await this.db.execAsync(`PRAGMA foreign_keys = ON`);
+      await createTable(this.db);
+      console.log("Database initialized successfully");
     }
     return this.db;
   }
@@ -94,7 +87,9 @@ export class DatabaseConnection {
       await db.execAsync("DROP TABLE IF EXISTS users");
       await db.execAsync("DROP TABLE IF EXISTS progress");
 
-      console.log("Database reset successfully");
+      await db.closeAsync();
+
+      console.log("Database reset successfully"); 
     } catch (error) {
       console.log("Error resetting database:", error);
       throw error;

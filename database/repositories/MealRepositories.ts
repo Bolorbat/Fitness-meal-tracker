@@ -3,14 +3,14 @@ import { BaseRepository } from "./BaseRepositories";
 import { useAuth } from "@/contexts/autoContext";
 
 export class MealRepository extends BaseRepository {
-  async addMeal(meal: Meal): Promise<number> {
+  async addMeal(meal: Meal, uid: string): Promise<number> {
     const db = await this.getDB();
     try {
       const result = await db.runAsync(
         `INSERT INTO meals (user_id, name, date, time, synced) VALUES (?,?,?,?,0)`,
         [meal.user_id, meal.name, meal.date, meal.time ?? null]
       );
-      await this.syncToSupabase("meals", "id");
+      await this.syncToSupabase("meals", "id", uid);
       return result.lastInsertRowId;
     } catch (err) {
       console.log("Error adding food : ", err);
@@ -36,7 +36,7 @@ export class MealRepository extends BaseRepository {
           item.portion_size,
         ]
       );
-      await this.syncToSupabase("meal_items", "id");
+      await this.syncToSupabase("meal_items", "id", "");
       if (result) console.log("Meal added to local");
     } catch (err) {
       console.log("Error adding food : ", err);
@@ -54,7 +54,7 @@ export class MealRepository extends BaseRepository {
       const result = await db.runAsync(`DELETE FROM meals WHERE id = ?`, [id]);
       if (result) {
         alert(`${meal?.food_name} deleted`);
-        this.syncToSupabase("meals", "id");
+        this.syncToSupabase("meals", "id", "");
       }
     } catch (err) {
       console.log("Error in delete meal", err);

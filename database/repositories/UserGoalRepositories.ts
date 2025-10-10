@@ -38,7 +38,7 @@ export class UserGoalRepository extends BaseRepository {
           target_fat,
         ]
       );
-      await this.syncToSupabase("user_goals", "id");
+      await this.syncToSupabase("user_goals", "id", user.id);
     } catch (err) {
       console.log("Error in set user goals : ", err);
     }

@@ -104,7 +104,7 @@ const FoodDetails = () => {
         created_at: String(`${year}:${month}:${day}`),
         user_id: user?.uid ?? "",
       };
-      const mealId = await db.meal.addMeal(meal);
+      const mealId = await db.meal.addMeal(meal, uid);
       const mealItem = {
         ...mealData,
         meal_id: mealId,

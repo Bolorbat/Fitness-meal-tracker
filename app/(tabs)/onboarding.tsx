@@ -32,6 +32,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { TrashIcon } from "phosphor-react-native";
+import { useAuth } from "@/contexts/autoContext";
 
 type DailyGoalConfig = {
   leftValue: number;
@@ -222,7 +223,7 @@ function RecentFoodCard({
               <View className="flex-row justify-between items-center">
                 <Text>{meal.food_name}</Text>
                 <View className="rounded-full bg-white p-1">
-                  <Text>{meal.time}</Text>
+                  <Text>{meal.time?.slice(0, 5)}</Text>
                 </View>
               </View>
             </View>

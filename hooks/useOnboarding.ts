@@ -1,7 +1,7 @@
 import { db } from "@/database/services/DataBaseService";
 import { useEffect, useState } from "react";
 
-export function useOnboardingStatus(userId?: string) {
+export function useOnboardingStatus(userId?: string, syncCompleted?: boolean) {
   const [status, setStatus] = useState<"loading" | "incomplete" | "done">(
     "loading"
   );
@@ -12,10 +12,10 @@ export function useOnboardingStatus(userId?: string) {
       return;
     }
 
-    db.goal.findByUserId(userId).then((completed) => {
+    db.users.getOnboardingStatus(userId).then((completed) => {
       setStatus(completed ? "done" : "incomplete");
     });
-  }, [userId]);
+  }, [userId, syncCompleted]);
 
   return status;
 }

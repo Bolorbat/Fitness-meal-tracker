@@ -4,6 +4,7 @@ import { db } from "@/database/services/DataBaseService";
 import { fetchFood } from "@/database/supabase/fetchFood";
 import { Meal, MealItem } from "@/models/meal";
 import { searchFood } from "@/services/api/foodApi";
+import { getDate, getTime } from "@/utils/dateHelper";
 import { Image } from "expo-image";
 import { Router, useLocalSearchParams, useRouter } from "expo-router";
 import { FireIcon } from "phosphor-react-native";
@@ -88,20 +89,15 @@ const FoodDetails = () => {
   };
 
   const HandleOnLog = async (router: Router, uid: string): Promise<void> => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-
+    const date = getDate();
+    const time = getTime();
     if (mealData) {
       const meal: Meal = {
         name: "lunch",
-        date: `${year}-${month}-${day}`,
-        time: `${hours}:${minutes}`,
+        date: date,
+        time: time,
         synced: 0,
-        created_at: String(`${year}:${month}:${day}`),
+        created_at: date,
         user_id: user?.uid ?? "",
       };
       const mealId = await db.meal.addMeal(meal, uid);

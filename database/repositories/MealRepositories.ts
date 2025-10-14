@@ -1,6 +1,7 @@
 import { Meal, MealItem } from "@/models/meal";
 import { BaseRepository } from "./BaseRepositories";
 import { useAuth } from "@/contexts/autoContext";
+import { getDate } from "@/utils/dateHelper";
 
 export class MealRepository extends BaseRepository {
   async addMeal(meal: Meal, uid: string): Promise<number> {
@@ -83,10 +84,11 @@ export class MealRepository extends BaseRepository {
   }
   async getBoth(): Promise<MealItem[]> {
     const db = await this.getDB();
+    const currentDate = getDate();
     try {
       return (await db.getAllAsync(
-        `SELECT meal_items.*, meals.time, meals.date FROM meal_items INNER JOIN meals ON meal_items.meal_id = meals.id ORDER BY meals.date ASC, meals.time ASC`
-      )) as MealItem[];
+        `SELECT meal_items.*, meals.time, meals.date FROM meal_items INNER JOIN meals ON meal_items.meal_id = meals.id WHERE meals.date == ? ORDER BY meals.date ASC, meals.time ASC`
+      ,[currentDate])) as MealItem[];
     } catch (err) {
       console.log("Error getting meal items from db");
       throw err;

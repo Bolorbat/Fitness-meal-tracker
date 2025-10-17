@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+import { colors } from "./theme/colors";
 module.exports = {
   // NOTE: Update this to include the paths to all files that contain Nativewind classes.
   content: [
@@ -10,22 +11,7 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
-      colors: {
-        blue: {
-          light: "#92A3FD",
-          dark: "#9DCEFF",
-        },
-        pink: {
-          light: "#C58BF2",
-          dark: "#EEA4CE",
-        },
-        black: "#1D1617",
-        gray: {
-          1: "#7B6F72",
-          2: "#ADA4A5",
-          3: "#DDDADA",
-        },
-      },
+      colors: colors,
       fontFamily: {
         PoppinsRegular: ["Poppins-Regular"],
         PoppinsSemiBold: ["Poppins-SemiBold"],

@@ -1,6 +1,6 @@
 export interface Meal {
   id?: number;
-  user_id : string,
+  user_id: string;
   name: string;
   // meal_type: "breakfast" | "lunch" | "dinner" | "snack";
   date: string; // YYYY-MM-DD format
@@ -28,4 +28,14 @@ export interface MealItem {
   //from joined meal table
   time?: string;
   date?: string;
+}
+
+export interface MealPlans {
+  id: number;
+  plan_name: string;
+  description: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  rating: number;
 }

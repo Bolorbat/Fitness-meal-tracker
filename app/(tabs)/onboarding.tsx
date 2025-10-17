@@ -115,7 +115,7 @@ function CaloriesCard({
 
 function NutrientCard({ item }: { item: DailyGoalConfig }) {
   return (
-    <View className="flex-1 h-full rounded-2xl items-start shadow-md pt-3 pl-3 bg-white">
+    <View className="flex-1 h-full rounded-2xl items-start shadow-md p-3 bg-white">
       <Text className="font-PoppinsRegular">{item.leftValue}g</Text>
       <Text className="pt-1.5">{item.label} left</Text>
       <View className="pt-4 pl-2 items-center justify-center relative">

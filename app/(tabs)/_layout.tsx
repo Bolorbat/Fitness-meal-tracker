@@ -1,10 +1,10 @@
 import { AuthProvider, useAuth } from "@/contexts/autoContext";
 import { useOnboardingStatus } from "@/hooks/useOnboarding";
+import { colors } from "@/theme/colors";
 import { Image } from "expo-image";
-import { Tabs, useRouter } from "expo-router";
+import { Stack, Tabs, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { ImageSourcePropType } from "react-native";
-// import {colors} from "@/tailwind.config";
 
 type TabConfig = {
   name: string;
@@ -34,33 +34,31 @@ const tabs: TabConfig[] = [
 const _Layout = () => {
   return (
     <Tabs screenOptions={{ tabBarItemStyle: { paddingVertical: 10 } }}>
-      {tabs.map(({ name, size, icon }) => (
-        <Tabs.Screen
-          key={name}
-          name={name}
-          options={{
-            tabBarLabel: "",
-            headerShown: false,
-            tabBarIcon: ({
-              focused,
-            }: {
-              focused: boolean;
-              color: string;
-              size: number;
-            }) => (
-              <Image
-                source={icon}
-                style={{
-                  width: size,
-                  height: size,
-                  // tintColor: focused ? colors.blue.dark : colors.gray[100],
-                }}
-              />
-            ),
-          }}
-        />
-      ))}
-    </Tabs>
+        {tabs.map(({ name, size, icon }) => (
+          <Tabs.Screen
+            key={name}
+            name={name}
+            options={{
+              tabBarLabel: "",
+              headerShown: false,
+              tabBarIcon: ({
+                focused,
+              }: {
+                focused: boolean;
+                color: string;
+                size: number;
+              }) => (
+                <Image
+                  source={icon}
+                  style={{
+                    width: size,
+                    height: size,
+                    tintColor: focused ? colors.blue.light : colors.gray[1],
+                  }} />
+              ),
+            }} />
+        ))}
+      </Tabs>
   );
 };
 

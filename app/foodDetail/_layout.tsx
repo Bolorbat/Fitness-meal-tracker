@@ -1,13 +1,16 @@
-import { Stack } from "expo-router";
+import { BackButton } from "@/components/BackButton";
+import { router, Stack } from "expo-router";
 import React from "react";
 
 const FoodLayout = () => {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen
+    <Stack screenOptions={{ headerShown: true }}>
+    <Stack.Screen
         name="foodMenu"
         options={{
-          headerShown: true,
+          headerLeft: () => (
+            <BackButton/>
+          ),
           headerTitle: "Log Food",
           headerStyle: { backgroundColor: "white" },
           headerShadowVisible: false,
@@ -18,12 +21,14 @@ const FoodLayout = () => {
       <Stack.Screen
         name="[mealName]"
         options={{
-          headerShown: true,
+          headerLeft: () => (
+            <BackButton/>
+          ),
           headerTitle: "Selected food",
           headerStyle: { backgroundColor: "white" },
           headerShadowVisible: false,
           headerTitleAlign: "center",
-          headerTitleStyle: { fontFamily: "Poppins-SemiBold" },
+          headerTitleStyle: { fontFamily: "Poppins-SemiBold" }, 
         }}
       />
     </Stack>

@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import * as React from "react";
 import { FlatList, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { CardSkeleton } from "@/components/CardSkeleton";
 
 // Helper to initialize clicked state
 const initialClickedState = (arr: MealItem[]) =>
@@ -99,16 +100,16 @@ const AllFood = () => {
   // Show skeleton while loading
   if (loading) {
     return (
-      <View className="flex px-7 pt-2">
+      <View className="flex-1 px-7 pt-2 bg-white">
         <Text style={{ fontFamily: "PoppinsSemiBold", fontSize: 16 }}>
           Suggestions
         </Text>
         <FlatList
           data={Array.from({ length: 6 })}
+          className="flex mt-1"
           keyExtractor={(_, i) => i.toString()}
-          renderItem={() => (
-            <View className="h-20 bg-gray-200 rounded-2xl mb-5" />
-          )}
+          renderItem={() => <CardSkeleton height={70} />}
+          ItemSeparatorComponent={() => <View style={{ marginBottom: 20 }} />}
         />
       </View>
     );

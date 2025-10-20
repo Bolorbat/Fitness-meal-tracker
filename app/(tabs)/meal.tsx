@@ -5,10 +5,13 @@ import { Image } from "expo-image";
 import CustomText from "@/components/CustomText";
 import { MealPlans } from "@/models/meal";
 import { fetchMealPlan } from "@/database/supabase/fetchMealPlan";
+import { CardSkeleton } from "@/components/CardSkeleton";
+
+const CARD_HEIGHT = 250;
 
 function MealPlanCard({ plan }: { plan: MealPlans }) {
   return (
-    <View className="flex-1 mt-12 rounded-3xl h-full shadow-md bg-white">
+    <View className="flex-1 mt-12 rounded-3xl shadow-md bg-white" style = {{height : CARD_HEIGHT}}>
       <Image
         source={require("../../assets/images/meal-template.jpg")}
         style={{ width: "100%", height: 100, borderTopLeftRadius: 24, borderTopRightRadius:24 }}
@@ -23,7 +26,7 @@ function MealPlanCard({ plan }: { plan: MealPlans }) {
         <Text className="text-justify text-[16px] color-gray-1">
           {plan.description}
         </Text>
-        <View className="flex flex-row gap-6 mt-4">
+        <View className="flex flex-row gap-6 mt-8">
           <View className="flex-col">
             <CustomText className="color-gray-1">Calories</CustomText>
             <CustomText>{plan.calories}</CustomText>
@@ -52,15 +55,34 @@ function MealPlanCard({ plan }: { plan: MealPlans }) {
 
 const Meal = () => {
   const [mealPlans, setMealPlans] = useState<MealPlans[]>();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchMealPlans = async () => {
-      const data = await fetchMealPlan();
-      if (data) setMealPlans(data);
+      try{
+        setLoading(true);
+        const data = await fetchMealPlan();
+        if (data) setMealPlans(data);
+      }finally{
+        setLoading(false);
+      }
     };
 
     fetchMealPlans();
   },[]);
+
+  if(loading){
+    return(
+        <FlatList
+          data={Array.from({length : 2})}
+          className="flex-1 p-7 mt-12"
+          keyExtractor={(_, i) => i.toString()}
+          renderItem={() => <CardSkeleton height={CARD_HEIGHT} borderRadius={24}/>
+        }
+        ItemSeparatorComponent={() => <View style= {{marginBottom : 20}}/>}
+        />
+    )
+  }
 
   return (
       <FlatList

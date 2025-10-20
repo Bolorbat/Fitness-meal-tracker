@@ -18,6 +18,7 @@ import {
   TouchableHighlight,
   TouchableOpacity,
 } from "react-native";
+import { Toast } from 'toastify-react-native'
 
 type NutritionProps = {
   icon: ImageSourcePropType;
@@ -100,13 +101,14 @@ const FoodDetails = () => {
         created_at: date,
         user_id: user?.uid ?? "",
       };
+      router.back();
       const mealId = await db.meal.addMeal(meal, uid);
+      Toast.success("Meal added succesfully");
       const mealItem = {
         ...mealData,
         meal_id: mealId,
       };
       await db.meal.addMealItem(mealItem);
-      router.back();
     }
   };
 
@@ -189,7 +191,7 @@ const FoodDetails = () => {
           activeOpacity={0.75}
           className="absolute bottom-10 w-full h-[50px] bg-black rounded-full justify-center"
           onPress={() => HandleOnLog(router, user?.uid ?? "")}
-        >
+        >   
           <Text className="font-PoppinsRegular text-center text-white text-xl">
             Log
           </Text>

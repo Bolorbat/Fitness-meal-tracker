@@ -7,6 +7,7 @@ import { useFonts } from "expo-font";
 import { isFirstLaunch } from "@/utils/isFirstLaunch";
 import { SyncAll, SyncService, SyncTable } from "@/database/supabase/sync";
 import { ActivityIndicator, View, Text } from "react-native";
+import ToastManager from "toastify-react-native";
 
 function RootLayoutNav() {
   const [fontsLoaded] = useFonts({
@@ -25,7 +26,7 @@ function RootLayoutNav() {
     const initializeDB = async () => {
       try {
         // await DatabaseConnection.getInstance().resetDatabase();
-        await initDB(); 
+        await initDB();
       } catch (err) {
         console.log("Error init db : ", err);
       }
@@ -117,6 +118,7 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <AuthProvider>
+      <ToastManager position="bottom" useModal={false} />
       <RootLayoutNav />
     </AuthProvider>
   );

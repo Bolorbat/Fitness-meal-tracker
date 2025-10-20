@@ -33,6 +33,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { TrashIcon } from "phosphor-react-native";
 import { useAuth } from "@/contexts/autoContext";
+import ToastManager, { Toast } from "toastify-react-native";
 
 type DailyGoalConfig = {
   leftValue: number;
@@ -295,6 +296,7 @@ export default function Onboarding() {
     //delete from supabase
     try {
       await db.meal.deleteMeal(item.meal_id);
+      Toast.error("Meal deleted");
       setMealItems((prev) => prev.filter((m) => item.meal_id !== m.meal_id));
 
       fetchMeals();
@@ -309,12 +311,12 @@ export default function Onboarding() {
 
   return (
     <FlatList
-      className="flex p-7"
-      data={mealItems}
-      keyExtractor={(item) => item.meal_id.toString()}
-      showsVerticalScrollIndicator={false}
-      ListHeaderComponent={
-        <>
+    className="flex p-7"
+    data={mealItems}
+    keyExtractor={(item) => item.meal_id.toString()}
+    showsVerticalScrollIndicator={false}
+    ListHeaderComponent={
+      <>
           <CaloriesCard
             dailyCalories={userGoal?.daily_calories ?? 1}
             totalCalories={totalCalories}

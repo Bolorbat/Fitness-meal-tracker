@@ -54,7 +54,6 @@ export class MealRepository extends BaseRepository {
       )) as MealItem;
       const result = await db.runAsync(`DELETE FROM meals WHERE id = ?`, [id]);
       if (result) {
-        alert(`${meal?.food_name} deleted`);
         this.syncToSupabase("meals", "id", "");
       }
     } catch (err) {

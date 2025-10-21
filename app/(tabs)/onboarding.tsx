@@ -153,6 +153,7 @@ function RecentFoodCard({
   const deleteOpacity = useSharedValue(1);
 
   const panGesture = Gesture.Pan()
+    .activeOffsetX([-10,10])
     .onUpdate((e) => {
       if (onLeft.value) {
         position.value = e.translationX;
@@ -311,7 +312,7 @@ export default function Onboarding() {
 
   return (
     <FlatList
-    className="flex p-7"
+    className="flex-1 p-7"
     data={mealItems}
     keyExtractor={(item) => item.meal_id.toString()}
     showsVerticalScrollIndicator={false}

@@ -33,7 +33,7 @@ export const CardSkeleton = ({ height, borderRadius = 20 }: Props) => {
       className="bg-gray-200 shadow-md w-full overflow-hidden"
       style={{ height, borderRadius }}
     >
-      <Animated.View
+      {/* <Animated.View
         style={[
           StyleSheet.absoluteFillObject,
           {
@@ -49,7 +49,7 @@ export const CardSkeleton = ({ height, borderRadius = 20 }: Props) => {
           end={{ x: 1, y: 0 }}
           style={{ flex: 1, borderRadius }}
         />
-      </Animated.View>
+      </Animated.View> */}
     </View>
   );
 };

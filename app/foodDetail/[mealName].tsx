@@ -7,7 +7,7 @@ import { searchFood } from "@/services/api/foodApi";
 import { getDate, getTime } from "@/utils/dateHelper";
 import { Image } from "expo-image";
 import { Router, useLocalSearchParams, useRouter } from "expo-router";
-import { FireIcon } from "phosphor-react-native";
+import { CurrencyBtcIcon, FireIcon } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 import {
   View,
@@ -18,7 +18,7 @@ import {
   TouchableHighlight,
   TouchableOpacity,
 } from "react-native";
-import { Toast } from 'toastify-react-native'
+import { Toast } from "toastify-react-native";
 
 type NutritionProps = {
   icon: ImageSourcePropType;
@@ -49,6 +49,10 @@ function MeasurementButtons({
   );
 }
 
+const toFormat = (val : number) => {
+  return Number.isInteger(val) ? val : val.toFixed(2);
+}
+
 function CaloryCard({ calories }: { calories: number }) {
   return (
     <View className="mt-16 flex-row h-[80px] border border-gray-2 rounded-3xl gap-2 items-center">
@@ -57,7 +61,7 @@ function CaloryCard({ calories }: { calories: number }) {
       </View>
       <View className="flex-col">
         <Text className="font-PoppinsRegular">Calories</Text>
-        <Text className="font-PoppinsBold text-3xl">{calories}</Text>
+        <Text className="font-PoppinsBold text-3xl">{toFormat(calories)}</Text>
       </View>
     </View>
   );
@@ -71,19 +75,42 @@ function NutritionCards({ data }: { data: NutritionProps }) {
       </View>
       <View className="ml-1">
         <Text className="font-PoppinsRegular">{data.name}</Text>
-        <Text className="font-PoppinsSemiBold">{data.value + "g"}</Text>
+        <Text className="font-PoppinsSemiBold">{toFormat(data.value) + "g"}</Text>
       </View>
     </View>
   );
 }
 
+const isNumeric = (str: string) => {
+  return /^[0-9]+$/.test(str) || str === "";
+};
+
 const FoodDetails = () => {
   const { mealName } = useLocalSearchParams<{ mealName: string }>();
   const [mealData, setMealData] = useState<MealItem>();
+  const [mealInitalData, setMealInitialData] = useState<MealItem>();
   const [currentMeasure, setCurrentMeasure] = useState<string>("Medium");
-  const [currentServings, setCurrentServings] = useState<string>("1");
+  const [currentServings, setCurrentServings] = useState("1");
   const router = useRouter();
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (!isNumeric(currentServings)) return;
+    if (mealInitalData) {
+      let multiply = parseInt(currentServings);
+
+      if (currentServings.length === 0 || currentServings === undefined)
+        multiply = 1;
+
+      setMealData({
+        ...mealInitalData,
+        calories: mealInitalData.calories * multiply,
+        protein: mealInitalData.protein * multiply,
+        carbs: mealInitalData.carbs * multiply,
+        fat: mealInitalData.fat * multiply,
+      });
+    }
+  }, [currentServings]);
 
   const HandleOnMeasurement = (type: string) => {
     setCurrentMeasure(type);
@@ -120,7 +147,10 @@ const FoodDetails = () => {
         //   portion_size: 0,
         // });
         const foodData = await fetchFood({ name: mealName });
-        if (foodData) setMealData(foodData[0]);
+        if (foodData) {
+          setMealData(foodData[0]);
+          setMealInitialData(foodData[0]);
+        }
         const mealItems = await db.meal.getMealItems();
         const meal = await db.meal.getMeal(mealData?.meal_id ?? 0);
         console.log("meal: ", meal);
@@ -172,14 +202,14 @@ const FoodDetails = () => {
           <View className="w-[130px] h-full border rounded-2xl">
             <TextInput
               onChangeText={setCurrentServings}
-              className="text-center"
+              className="flex-1 text-center"
             >
               {currentServings}
             </TextInput>
           </View>
         </View>
 
-        <CaloryCard calories={mealData?.calories || 0} />
+        <CaloryCard calories = {mealData?.calories || 0} />
 
         <View className="flex-row gap-2 mt-2 h-[60px]">
           {Nutritions.map((item, idx) => (
@@ -191,7 +221,7 @@ const FoodDetails = () => {
           activeOpacity={0.75}
           className="absolute bottom-10 w-full h-[50px] bg-black rounded-full justify-center"
           onPress={() => HandleOnLog(router, user?.uid ?? "")}
-        >   
+        >
           <Text className="font-PoppinsRegular text-center text-white text-xl">
             Log
           </Text>

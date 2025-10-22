@@ -1,14 +1,12 @@
 import Text from "@/components/CustomText";
 import { MealItem } from "@/models/meal";
-import { searchFood } from "@/services/api/foodApi";
-import { fetchFood, fetchFoods } from "@/database/supabase/fetchFood";
+import { fetchFoods } from "@/database/supabase/fetchFood";
 import { router } from "expo-router";
 import * as React from "react";
-import { FlatList, Pressable, View } from "react-native";
+import { FlatList, Pressable, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { CardSkeleton } from "@/components/CardSkeleton";
+import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 
-// Helper to initialize clicked state
 const initialClickedState = (arr: MealItem[]) =>
   arr.reduce(
     (acc, item) => {
@@ -18,7 +16,6 @@ const initialClickedState = (arr: MealItem[]) =>
     {} as { [key: number]: boolean }
   );
 
-// Memoized row component
 const FoodRow = React.memo(
   ({
     item,
@@ -44,43 +41,32 @@ const FoodRow = React.memo(
         <Text style={{ fontFamily: "PoppinsSemiBold" }}>{item.food_name}</Text>
         <Text className="text-gray-500">{item.calories + " cal"}</Text>
       </View>
-      {addClicked[item.meal_id] ? (
-        <Pressable
-          className="w-10 h-10 rounded-full bg-white items-center justify-center"
-          onPress={() => onRemoveClicked(item.meal_id)}
-        >
-          <Text className="text-3xl">-</Text>
-        </Pressable>
-      ) : (
-        <Pressable
-          className="w-10 h-10 rounded-full bg-white items-center justify-center"
-          onPress={() => onAddClicked(item.meal_id)}
-        >
-          <Text className="text-3xl">+</Text>
-        </Pressable>
-      )}
+
+      <Pressable
+        className="w-10 h-10 rounded-full bg-white items-center justify-center"
+        onPress={() =>
+          addClicked[item.meal_id]
+            ? onRemoveClicked(item.meal_id)
+            : onAddClicked(item.meal_id)
+        }
+      >
+        <Text className="text-3xl">{addClicked[item.meal_id] ? "-" : "+"}</Text>
+      </Pressable>
     </Pressable>
   )
 );
 
-const AllFood = () => {
+const MyFoods = ({ setLoading }: { setLoading: (v: boolean) => void }) => {
   const [foods, setFoods] = React.useState<MealItem[]>([]);
   const [addClicked, setAddClicked] = React.useState<{
     [key: number]: boolean;
   }>({});
-  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchFoodData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const data = await fetchFoods();
-        // const data = await searchFood({
-        //   query: "egg",
-        //   page: 0,
-        //   max_results: 2,
-        //   portion_size: 0,
-        // });
         setFoods(data);
         setAddClicked(initialClickedState(data));
       } finally {
@@ -90,61 +76,128 @@ const AllFood = () => {
     fetchFoodData();
   }, []);
 
-  const onAddClicked = (id: number) => {
+  const onAddClicked = React.useCallback((id: number) => {
     setAddClicked((prev) => ({ ...prev, [id]: true }));
-  };
-  const onRemoveClicked = (id: number) => {
-    setAddClicked((prev) => ({ ...prev, [id]: false }));
-  };
+  }, []);
 
-  // Show skeleton while loading
-  if (loading) {
-    return (
-      <View className="flex-1 px-7 pt-2 bg-white">
-        <Text style={{ fontFamily: "PoppinsSemiBold", fontSize: 16 }}>
-          Suggestions
-        </Text>
-        <FlatList
-          data={Array.from({ length: 6 })}
-          className="flex mt-1"
-          keyExtractor={(_, i) => i.toString()}
-          renderItem={() => <CardSkeleton height={70} />}
-          ItemSeparatorComponent={() => <View style={{ marginBottom: 20 }} />}
-        />
-      </View>
-    );
-  }
+  const onRemoveClicked = React.useCallback((id: number) => {
+    setAddClicked((prev) => ({ ...prev, [id]: false }));
+  }, []);
+
+  const renderItem = React.useCallback(
+    ({ item }: { item: MealItem }) => (
+      <FoodRow
+        item={item}
+        addClicked={addClicked}
+        onAddClicked={onAddClicked}
+        onRemoveClicked={onRemoveClicked}
+      />
+    ),
+    [addClicked]
+  );
 
   return (
-    <View className="flex-1 px-7 pt-2 bg-white">
-      <Text style={{ fontFamily: "PoppinsSemiBold", fontSize: 16 }}>
-        Suggestions
-      </Text>
-      <FlatList
-        className="flex mt-1"
-        data={foods}
-        keyExtractor={(item) => item.meal_id.toString()}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <FoodRow
-            item={item}
-            addClicked={addClicked}
-            onAddClicked={onAddClicked}
-            onRemoveClicked={onRemoveClicked}
-          />
-        )}
-        // initialNumToRender={8}
-        // maxToRenderPerBatch={8}
-        // windowSize={5}
-        // removeClippedSubviews={true}
-        // getItemLayout={(data, index) => ({
-        //   length: 80, // your row height including margin
-        //   offset: 80 * index,
-        //   index,
-        // })}
-      />
-    </View>
+    <FlatList
+      className="flex-1 p-7"
+      data={foods}
+      keyExtractor={(item) => item.meal_id.toString()}
+      showsVerticalScrollIndicator={false}
+      renderItem={renderItem}
+      contentContainerStyle={{ marginBottom: 80 }}
+      ListHeaderComponent={
+        <Text
+          style={{
+            fontFamily: "PoppinsSemiBold",
+            fontSize: 16,
+            marginBottom: 8,
+          }}
+        >
+          Suggestions
+        </Text>
+      }
+    />
   );
 };
 
-export default AllFood;
+const All = () => (
+  <View className="flex-1 bg-white items-center justify-center">
+    <Text>All Foods</Text>
+  </View>
+);
+const MyMeals = () => (
+  <View className="flex-1 bg-white items-center justify-center">
+    <Text>My Meals</Text>
+  </View>
+);
+const Saved = () => (
+  <View className="flex-1 bg-white items-center justify-center">
+    <Text>Saved Foods</Text>
+  </View>
+);
+
+export default function AllFoodScreen() {
+  const layout = useWindowDimensions();
+  const [index, setIndex] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
+
+  const routes = React.useMemo(
+    () => [
+      { key: "all", title: "All" },
+      { key: "myfoods", title: "My Foods" },
+      { key: "mymeals", title: "My Meals" },
+      { key: "saved", title: "Saved Foods" },
+    ],
+    []
+  );
+
+  const renderScene = React.useCallback(({ route }: any) => {
+    switch (route.key) {
+      case "all":
+        return <All />;
+      case "myfoods":
+        return <MyFoods setLoading={setLoading} />;
+      case "mymeals":
+        return <MyMeals />;
+      case "saved":
+        return <Saved />;
+      default:
+        return null;
+    }
+  }, []);
+
+  return (
+    <View className="flex-1 bg-white">
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        initialLayout={{ width: layout.width }}
+        renderTabBar={(props) => (
+          <TabBar
+            {...props}
+            scrollEnabled = {false}
+            indicatorStyle={{
+              backgroundColor: "#222",
+              height: 3,
+              borderRadius: 2,
+            }}
+            style={{
+              backgroundColor: "#fff",
+              elevation: 0,
+              borderBottomWidth: 1,
+              borderBottomColor: "#e5e5e5",
+            }}
+            tabStyle={{ width: "auto", paddingHorizontal: 18 }}
+            // labelStyle={{
+            //   fontFamily: "PoppinsSemiBold",
+            //   fontSize: 16,
+            //   textTransform: "none",
+            // }}
+            activeColor="#000"
+            inactiveColor="#A0A0A0"
+          />
+        )}
+      />
+    </View>
+  );
+}

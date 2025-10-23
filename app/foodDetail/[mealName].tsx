@@ -49,9 +49,9 @@ function MeasurementButtons({
   );
 }
 
-const toFormat = (val : number) => {
+const toFormat = (val: number) => {
   return Number.isInteger(val) ? val : val.toFixed(2);
-}
+};
 
 function CaloryCard({ calories }: { calories: number }) {
   return (
@@ -75,7 +75,9 @@ function NutritionCards({ data }: { data: NutritionProps }) {
       </View>
       <View className="ml-1">
         <Text className="font-PoppinsRegular">{data.name}</Text>
-        <Text className="font-PoppinsSemiBold">{toFormat(data.value) + "g"}</Text>
+        <Text className="font-PoppinsSemiBold">
+          {toFormat(data.value) + "g"}
+        </Text>
       </View>
     </View>
   );
@@ -111,6 +113,19 @@ const FoodDetails = () => {
       });
     }
   }, [currentServings]);
+
+  useEffect(() => {
+    let factor = currentMeasure === "Small" ? 0.9 : currentMeasure === "Large" ? 1.1 : currentMeasure === "S" ? 0.8 : 1;
+    if ((currentServings !== undefined || currentServings !== "") && mealInitalData) {
+      setMealData({
+        ...mealInitalData,
+        calories: mealInitalData?.calories * factor,
+        protein: mealInitalData?.protein * factor,
+        carbs: mealInitalData?.carbs * factor,
+        fat: mealInitalData?.fat * factor,
+      });
+    }
+  }, [currentMeasure]);
 
   const HandleOnMeasurement = (type: string) => {
     setCurrentMeasure(type);
@@ -209,7 +224,7 @@ const FoodDetails = () => {
           </View>
         </View>
 
-        <CaloryCard calories = {mealData?.calories || 0} />
+        <CaloryCard calories={mealData?.calories || 0} />
 
         <View className="flex-row gap-2 mt-2 h-[60px]">
           {Nutritions.map((item, idx) => (

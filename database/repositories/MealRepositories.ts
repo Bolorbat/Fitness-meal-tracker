@@ -81,13 +81,13 @@ export class MealRepository extends BaseRepository {
       throw err;
     }
   }
-  async getBoth(): Promise<MealItem[]> {
+  // string format should YYYY-MM-DD
+  async getBoth(date : string): Promise<MealItem[]> {
     const db = await this.getDB();
-    const currentDate = getDate();
     try {
       return (await db.getAllAsync(
         `SELECT meal_items.*, meals.time, meals.date FROM meal_items INNER JOIN meals ON meal_items.meal_id = meals.id WHERE meals.date == ? ORDER BY meals.date ASC, meals.time ASC`
-      ,[currentDate])) as MealItem[];
+      ,[date])) as MealItem[];
     } catch (err) {
       console.log("Error getting meal items from db");
       throw err;

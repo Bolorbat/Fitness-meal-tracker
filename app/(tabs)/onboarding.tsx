@@ -102,8 +102,8 @@ const getWeekIndex = (day: number) => {
 
 type Props = {
   days: WeekDay[];
-  currentDay: number; // currently selected day
-  onDayChanged: (day: number, date: string) => void;
+  currentDay: WeekDay | null; // currently selected day
+  onDayChanged: (day: WeekDay, date: string) => void;
 };
 
 const Days = memo(({ days, currentDay, onDayChanged }: Props) => {
@@ -116,11 +116,11 @@ const Days = memo(({ days, currentDay, onDayChanged }: Props) => {
   const sidePadding = 7;
 
   useEffect(() => {
-    if (!flatListRef.current) return;
+    if (!flatListRef.current || currentDay === null) return;
 
     // Scroll to the week containing the currentDay
     const index = days.findIndex(
-      (d) => d.day === currentDay && d.monthOffset === 0
+      (d) => d.day === currentDay.day && d.monthOffset === currentDay.monthOffset
     );
     const currentWeekIndex = Math.floor(index / 7);
 
@@ -165,7 +165,7 @@ const Days = memo(({ days, currentDay, onDayChanged }: Props) => {
     const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(
       dayObj.day
     ).padStart(2, "0")}`;
-    onDayChanged(dayObj.day, dateStr);
+    onDayChanged({day : dayObj.day, monthOffset : dayObj.monthOffset}, dateStr);
   };
 
   const today = new Date().getDate();
@@ -189,7 +189,7 @@ const Days = memo(({ days, currentDay, onDayChanged }: Props) => {
       getItemLayout={getItemLayout}
       onMomentumScrollEnd={onMomentumScrollEnd}
       renderItem={({ item }) => {
-        const isCurrent = item.day === currentDay && item.monthOffset === 0;
+        const isCurrent = item.day === currentDay?.day && item.monthOffset === currentDay.monthOffset;
         return (
           <Pressable
             style={{
@@ -403,7 +403,7 @@ export default function Onboarding() {
   const [totalCarbs, setTotalCarbs] = useState(0);
   const [totalFat, setTotalFat] = useState(0);
   const [days, setDays] = useState<WeekDay[]>([]);
-  const [currentDay, setCurrentDay] = useState(0);
+  const [currentDay, setCurrentDay] = useState<WeekDay>();
   const [selectedDate, setSelectedDate] = useState(getDate());
 
   const fetchMeals = useCallback(
@@ -438,7 +438,7 @@ export default function Onboarding() {
   );
 
   const handleDayChange = useCallback(
-    (day: number, date: string) => {
+    (day: WeekDay, date: string) => {
       setCurrentDay(day);
       setSelectedDate(date);
       fetchMeals(date);
@@ -494,13 +494,6 @@ export default function Onboarding() {
     }
 
     for (let i = 1; i <= daysInCurrentMonth; i++) {
-      const day = new Date(currentYear, currentDay, i);
-      if (i > date.getDate() && day.getDay() === 6) {
-        setDays(daysArray);
-        setCurrentDay(today);
-        return;
-      }
-
       daysArray.push({
         day: i,
         monthOffset: 0,
@@ -520,10 +513,8 @@ export default function Onboarding() {
       }
     }
 
-    console.log(daysArray);
-
     setDays(daysArray);
-    setCurrentDay(today);
+    setCurrentDay({day : today, monthOffset : 0});
   }, []);
 
   return (
@@ -536,7 +527,7 @@ export default function Onboarding() {
         <>
           <Days
             days={days}
-            currentDay={currentDay}
+            currentDay={currentDay ?? null}
             onDayChanged={handleDayChange}
           />
           <CaloriesCard

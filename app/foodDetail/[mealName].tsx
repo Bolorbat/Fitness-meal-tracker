@@ -49,10 +49,6 @@ function MeasurementButtons({
   );
 }
 
-const toFormat = (val: number) => {
-  return Number.isInteger(val) ? val : val.toFixed(2);
-};
-
 function CaloryCard({ calories }: { calories: number }) {
   return (
     <View className="mt-16 flex-row h-[80px] border border-gray-2 rounded-3xl gap-2 items-center">
@@ -61,7 +57,7 @@ function CaloryCard({ calories }: { calories: number }) {
       </View>
       <View className="flex-col">
         <Text className="font-PoppinsRegular">Calories</Text>
-        <Text className="font-PoppinsBold text-3xl">{toFormat(calories)}</Text>
+        <Text className="font-PoppinsBold text-3xl">{Math.round(calories)}</Text>
       </View>
     </View>
   );
@@ -76,7 +72,7 @@ function NutritionCards({ data }: { data: NutritionProps }) {
       <View className="ml-1">
         <Text className="font-PoppinsRegular">{data.name}</Text>
         <Text className="font-PoppinsSemiBold">
-          {toFormat(data.value) + "g"}
+          {Math.round(data.value) + "g"}
         </Text>
       </View>
     </View>

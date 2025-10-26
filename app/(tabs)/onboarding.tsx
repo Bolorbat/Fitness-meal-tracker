@@ -236,7 +236,7 @@ const CaloriesCard = memo(
       <View className="flex-row rounded-2xl shadow-md bg-white h-[150px]">
         <View className="w-1/2 h-full items-start justify-center pl-8">
           <Text className="font-PoppinsSemiBold text-[42px]">
-            {dailyCalories - totalCalories || 0}
+            {Math.round(dailyCalories - totalCalories) || 0}
           </Text>
           <Text className="-mt-2" style={{ fontSize: 14 }}>
             Calories left
@@ -377,7 +377,7 @@ const RecentFoodCard = memo(
                   className="text-lg"
                   style={{ fontFamily: "PoppinsSemiBold" }}
                 >
-                  {meal.calories + " calories"}
+                  {Math.round(meal.calories) + " calories"}
                 </Text>
               </View>
               <View className="flex-1 flex-row justify-start items-start gap-2">

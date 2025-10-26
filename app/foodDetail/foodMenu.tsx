@@ -6,6 +6,7 @@ import * as React from "react";
 import { FlatList, Pressable, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+import { CardSkeleton } from "@/components/CardSkeleton";
 
 const initialClickedState = (arr: MealItem[]) =>
   arr.reduce(
@@ -56,11 +57,12 @@ const FoodRow = React.memo(
   )
 );
 
-const MyFoods = ({ setLoading }: { setLoading: (v: boolean) => void }) => {
+const MyFoods = () => {
   const [foods, setFoods] = React.useState<MealItem[]>([]);
   const [addClicked, setAddClicked] = React.useState<{
     [key: number]: boolean;
   }>({});
+  const [isloading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     const fetchFoodData = async () => {
@@ -95,6 +97,31 @@ const MyFoods = ({ setLoading }: { setLoading: (v: boolean) => void }) => {
     ),
     [addClicked]
   );
+
+  if (isloading) {
+    return (
+      <FlatList
+        className="flex-1 p-7 gap-5"
+        data={Array.from({ length: 2 })}
+        keyExtractor={(_, i) => i.toString()}
+        renderItem={() => <CardSkeleton height={70} />}
+        ItemSeparatorComponent={() => <View style = {{marginBottom : 20}} />}
+        ListHeaderComponent={
+          <>
+            <Text
+              style={{
+                fontFamily: "PoppinsSemiBold",
+                fontSize: 16,
+                marginBottom: 8,
+              }}
+            >
+              Suggestions
+            </Text>
+          </>
+        }
+      />
+    );
+  }
 
   return (
     <FlatList
@@ -155,7 +182,7 @@ export default function AllFoodScreen() {
       case "all":
         return <All />;
       case "myfoods":
-        return <MyFoods setLoading={setLoading} />;
+        return <MyFoods />;
       case "mymeals":
         return <MyMeals />;
       case "saved":
@@ -175,7 +202,7 @@ export default function AllFoodScreen() {
         renderTabBar={(props) => (
           <TabBar
             {...props}
-            scrollEnabled = {false}
+            scrollEnabled={false}
             indicatorStyle={{
               backgroundColor: "#222",
               height: 3,

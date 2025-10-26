@@ -97,35 +97,28 @@ const FoodDetails = () => {
   const { user } = useAuth();
 
   useEffect(() => {
+    if (!mealInitalData) return;
     if (!isNumeric(currentServings)) return;
-    if (mealInitalData) {
-      let multiply = parseInt(currentServings);
 
-      if (currentServings.length === 0 || currentServings === undefined)
-        multiply = 1;
+    const serving = currentServings === "" ? 1 : parseInt(currentServings);
 
-      setMealData({
-        ...mealInitalData,
-        calories: mealInitalData.calories * multiply,
-        protein: mealInitalData.protein * multiply,
-        carbs: mealInitalData.carbs * multiply,
-        fat: mealInitalData.fat * multiply,
-      });
-    }
-  }, [currentServings]);
+    const factor =
+      currentMeasure === "Small"
+        ? 0.9
+        : currentMeasure === "Large"
+          ? 1.1
+          : currentMeasure === "S"
+            ? 0.8
+            : 1;
 
-  useEffect(() => {
-    let factor = currentMeasure === "Small" ? 0.9 : currentMeasure === "Large" ? 1.1 : currentMeasure === "S" ? 0.8 : 1;
-    if ((currentServings !== undefined || currentServings !== "") && mealInitalData) {
-      setMealData({
-        ...mealInitalData,
-        calories: mealInitalData?.calories * factor,
-        protein: mealInitalData?.protein * factor,
-        carbs: mealInitalData?.carbs * factor,
-        fat: mealInitalData?.fat * factor,
-      });
-    }
-  }, [currentMeasure]);
+    setMealData({
+      ...mealInitalData,
+      calories: mealInitalData.calories * factor * serving,
+      protein: mealInitalData.protein * factor * serving,
+      carbs: mealInitalData.carbs * factor * serving,
+      fat: mealInitalData.fat * factor * serving,
+    });
+  }, [currentMeasure, currentServings, mealInitalData]);
 
   const HandleOnMeasurement = (type: string) => {
     setCurrentMeasure(type);
@@ -157,10 +150,6 @@ const FoodDetails = () => {
   useEffect(() => {
     const fetchFoodData = async () => {
       try {
-        // const foodData = await searchFood({
-        //   query: mealName,
-        //   portion_size: 0,
-        // });
         const foodData = await fetchFood({ name: mealName });
         if (foodData) {
           setMealData(foodData[0]);
@@ -168,8 +157,6 @@ const FoodDetails = () => {
         }
         const mealItems = await db.meal.getMealItems();
         const meal = await db.meal.getMeal(mealData?.meal_id ?? 0);
-        console.log("meal: ", meal);
-        console.log("items : ", mealItems);
       } catch (err) {
         console.log("Error in foodDetails : " + err);
       }

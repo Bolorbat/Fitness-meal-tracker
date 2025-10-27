@@ -505,7 +505,7 @@ export default function Onboarding() {
 
     if (daysLeftInMonth < 7 - todayWeekday - 1) {
       const extraDays = 7 - (daysInCurrentMonth - today);
-      for (let i = 1; i <= extraDays; i++) {
+      for (let i = 1; i < extraDays; i++) {
         daysArray.push({
           day: i,
           monthOffset: 1,

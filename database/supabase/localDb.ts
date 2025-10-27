@@ -15,7 +15,6 @@ export const updateLocalRecords = async (
   records: any[],
   userId: string // Add userId parameter
 ): Promise<void> => {
-  console.log(userId);
   const db = await DatabaseConnection.getInstance().getDB();
 
   if (records.length == 0) {

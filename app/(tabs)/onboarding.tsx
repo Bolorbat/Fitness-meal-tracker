@@ -485,6 +485,7 @@ export default function Onboarding() {
     const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
 
     const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay();
+    const lastDay = new Date(currentYear, currentMonth, daysInCurrentMonth).getDay();
 
     for (let i = firstDayOfWeek - 1; i >= 1; i--) {
       daysArray.push({
@@ -504,7 +505,7 @@ export default function Onboarding() {
     const daysLeftInMonth = daysInCurrentMonth - today;
 
     if (daysLeftInMonth < 7 - todayWeekday - 1) {
-      const extraDays = 7 - (daysInCurrentMonth - today);
+      const extraDays = 7 - (lastDay);
       for (let i = 1; i < extraDays; i++) {
         daysArray.push({
           day: i,
